@@ -1,6 +1,7 @@
 from http.client import HTTPSConnection
-from json import dumps
+import json
 from time import sleep
+import threading
 from random import randint
 
 file = open("info.txt")
@@ -43,21 +44,60 @@ def send_message(connection, channel_id, message):
     }
 
     try:
-        connection.request("POST", f"/api/v6/channels/{channel_id}/messages", dumps(message_data), header_data)
+        connection.request("POST", f"/api/v6/channels/{channel_id}/messages", json.dumps(message_data), header_data)
         response = connection.getresponse()
-        if 199 < response.status < 300:
+        if 199 < response.status < 300: #everything is alright
             pass
         else:
             print(f"While sending message, received HTTP {response.status}: {response.reason}")
     except:
         print("Failed to send message")
 
-def cycle(period, command):
-    send_message(connect(), text[3], command)
-    sleep(period)
+def get_response(connection, channel_id):
+    channel = connection.request("GET", f"/api/v6/channels/{channel_id}/messages", headers=header_data)
+    response = connection.getresponse()
+
+    if 199 < response.status < 300: #everything is alright
+        response_dict_str = response.read().decode('utf-8')
+        response_dict = json.loads(response_dict_str)
+        return response_dict
+    else:
+        print(f"While sending message, received HTTP {response.status}: {response.reason}") 
+
+def reply_to_dank_memer(command):
+    response_dict = get_response(connect(), text[3])
+
+    if "search" in command:
+        send_message(connect(), text[3], search_response(response_dict))
+
+def search_response(response_dict):
+    response = response_dict[0]["content"]
+    response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
+    response = response.replace("\\", "")
+
+    search_options = []
+    #indexes of backticks
+    backticks = [i for i, letter in enumerate(response) if letter == '`']
+    search_options.append(response[(backticks[0]+1):backticks[1]])
+    search_options.append(response[(backticks[2]+1):backticks[3]])
+    search_options.append(response[(backticks[4]+1):backticks[5]])
+    print(search_options)
+    return search_options[randint(0,2)]
 
 def main():
     while True:
-        cycle(randint(46, 55), command_list)
+        send_message(connect(), text[3], "pls search")
+        sleep(3)
+        reply_to_dank_memer("pls search")
+        sleep(randint(29, 35))
+        '''
+        for command in command_list:
+            command = command.split("=")[0].strip()
+            send_message(connect(), text[3], command)
+            sleep(3)
+            reply_to_dank_memer(command)
+            sleep(3)
+            sleep(randint(2,5))
+        '''
 
 main()

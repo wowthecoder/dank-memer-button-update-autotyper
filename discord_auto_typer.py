@@ -20,6 +20,9 @@ if len(text)!= 4 or input("Configure bot? (y/n)") == "y":
 
     file.close()
 
+comm_file = open("dank_commands.txt")
+command_list = comm_file.read().splitlines()
+
 header_data = {
     "content-type": "application/json",
     "user-agent": text[0],
@@ -55,6 +58,6 @@ def cycle(period, command):
 
 def main():
     while True:
-        cycle(randint(46, 55), "pls beg")
+        cycle(randint(46, 55), command_list)
 
 main()

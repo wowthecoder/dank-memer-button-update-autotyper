@@ -110,7 +110,6 @@ def pm_response():
     sleep(3)
     pm_result_dict = get_response(connect(), text[3])
     pm_result = pm_result_dict[0]["content"]
-    print(pm_result)
     if "is broken" in pm_result:
         #check whether user still has laptops
         send_message(connect(), text[3], "pls item laptop")
@@ -133,9 +132,8 @@ def main():
         for command in command_list:
             command = command.split("=")[0].strip()
             send_message(connect(), text[3], command)
-            sleep(3)
+            sleep(2)
             reply_to_dank_memer(command)
-            sleep(3)
-            sleep(randint(2,5))
+            sleep(randint(3,6))
 
 main()

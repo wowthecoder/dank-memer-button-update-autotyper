@@ -72,6 +72,11 @@ def reply_to_dank_memer(command):
         send_message(connect(), text[3], search_response(response_dict))
     elif "hl" in command:
         send_message(connect(), text[3], hl_response(response_dict))
+    elif "pm" in command:
+        pm_response()
+    elif "trivia" in command:
+        ans_choices = ['a', 'b', 'c', 'd']
+        send_message(connect(), text[3], ans_choices[randint(0,3)])
 
 def search_response(response_dict):
     response = response_dict[0]["content"]
@@ -99,11 +104,30 @@ def hl_response(response_dict):
     else:
         return "l"
 
+def pm_response():
+    pm_options = ['f', 'r', 'i', 'c', 'k']
+    send_message(connect(), text[3], pm_options[randint(0,4)])
+    sleep(3)
+    pm_result_dict = get_response(connect(), text[3])
+    pm_result = pm_result_dict[0]["content"]
+    print(pm_result)
+    if "is broken" in pm_result:
+        #check whether user still has laptops
+        send_message(connect(), text[3], "pls item laptop")
+        sleep(2)
+        laptop_reply_dict = get_response(connect(), text[3])
+        laptop_reply = laptop_reply_dict[0]["embeds"][0]["title"]
+        if "owned" not in laptop_reply:
+            send_message(connect(), text[3], "pls with 3500")
+            sleep(1)
+            send_message(connect(), text[3], "pls buy laptop")
+
 def main():
     while True:
-        send_message(connect(), text[3], "pls hl")
+        '''For testing
+        send_message(connect(), text[3], "pls trivia")
         sleep(3)
-        reply_to_dank_memer("pls hl")
+        reply_to_dank_memer("pls trivia")
         sleep(randint(29, 35))
         '''
         for command in command_list:
@@ -113,6 +137,5 @@ def main():
             reply_to_dank_memer(command)
             sleep(3)
             sleep(randint(2,5))
-        '''
 
 main()

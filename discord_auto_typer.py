@@ -3,6 +3,7 @@ import json
 from time import sleep
 import threading
 from random import randint
+import re
 
 file = open("info.txt")
 text = file.read().splitlines()
@@ -69,6 +70,8 @@ def reply_to_dank_memer(command):
 
     if "search" in command:
         send_message(connect(), text[3], search_response(response_dict))
+    elif "hl" in command:
+        send_message(connect(), text[3], hl_response(response_dict))
 
 def search_response(response_dict):
     response = response_dict[0]["content"]
@@ -84,11 +87,23 @@ def search_response(response_dict):
     print(search_options)
     return search_options[randint(0,2)]
 
+def hl_response(response_dict):
+    response = response_dict[0]["embeds"][0]["description"]
+    response = response.replace("\\ufeff", "")
+    response = response.replace("\\", "")
+
+    bold_asterisks = [a.start() for a in re.finditer("\*\*", response)]
+    hint = int(response[(bold_asterisks[0]+2):bold_asterisks[1]])
+    if hint <= 50:
+        return "h"
+    else:
+        return "l"
+
 def main():
     while True:
-        send_message(connect(), text[3], "pls search")
+        send_message(connect(), text[3], "pls hl")
         sleep(3)
-        reply_to_dank_memer("pls search")
+        reply_to_dank_memer("pls hl")
         sleep(randint(29, 35))
         '''
         for command in command_list:

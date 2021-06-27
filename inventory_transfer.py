@@ -61,7 +61,7 @@ def get_response(connection, channel_id):
         response_dict = json.loads(response_dict_str)
         return response_dict
     else:
-        print(f"While sending message, received HTTP {response.status}: {response.reason}")
+        print(f"While fetching message, received HTTP {response.status}: {response.reason}")
 
 def main():
     send_message(connect(), text[3], "pls inv")

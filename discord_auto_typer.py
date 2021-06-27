@@ -1,7 +1,6 @@
 from http.client import HTTPSConnection
 import json
 from time import sleep
-import threading
 from random import randint
 import re
 
@@ -63,7 +62,7 @@ def get_response(connection, channel_id):
         response_dict = json.loads(response_dict_str)
         return response_dict
     else:
-        print(f"While sending message, received HTTP {response.status}: {response.reason}") 
+        print(f"While fetching message, received HTTP {response.status}: {response.reason}") 
 
 def reply_to_dank_memer(command):
     response_dict = get_response(connect(), text[3])

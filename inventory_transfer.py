@@ -68,8 +68,8 @@ def main():
     sleep(2)
     response_dict = get_response(connect(), text[3])
     footer = response_dict[0]["embeds"][0]["footer"]["text"]
-    keyword_of = [k.start() for k in re.finditer("of", footer)]
-    total_page_num = int(footer[(keyword_of[0]+3):])
+    numbers = list(map(int, re.findall(r'\d+', footer)))
+    total_page_num = numbers[-1]
     print(total_page_num)
     for page in range(1, total_page_num+1):
         send_message(connect(), text[3], "pls inv")
@@ -78,16 +78,10 @@ def main():
         fields = response_dict[0]["embeds"][0]["fields"][0]["value"]
 
         #Get the number of items
-        bold_asterisks = [a.start() for a in re.finditer("\*\*", fields)]
-        #The asterisks will be in pairs(eg, **haha**), and only the second one is needed
-        num_of_items = []
-        for i in range(1, len(bold_asterisks), 2):
-            num_start_pos = bold_asterisks[i] + 5
-            num_str = ""
-            while fields[num_start_pos].isdigit():
-                num_str += fields[num_start_pos]
-                num_start_pos += 1
-            num_of_items.append(int(num_str))
+        item_count = list(map(int, re.findall(r'\d+', fields)))
+        #remove all ids of emojis
+        item_count = [count for count in item_count if count < 150000]
+        print(item_count)
 
         #Get the item id/name
         backticks = [b.start() for b in re.finditer("`", fields)]
@@ -96,8 +90,8 @@ def main():
             item_name = fields[(backticks[m]+1):backticks[m+1]]
             name_of_items.append(item_name)
         
-        for n in range(len(num_of_items)):
-            send_message(connect(), text[3], f"pls gift {num_of_items[n]} {name_of_items[n]} {alt_acc}")
+        for n in range(len(item_count)):
+            send_message(connect(), text[3], f"pls gift {item_count[n]} {name_of_items[n]} {alt_acc}")
             sleep(1)
             response_dict = get_response(connect(), text[3])
             reply_content = response_dict[0]["content"]

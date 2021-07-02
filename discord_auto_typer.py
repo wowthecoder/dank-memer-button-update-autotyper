@@ -3,11 +3,13 @@ import json
 from time import sleep
 from random import randint
 import re
+from pynput import keyboard
+import threading
 
 file = open("info.txt")
 text = file.read().splitlines()
 
-if len(text)!= 4 or input("Configure bot? (y/n)") == "y":
+if len(text)!= 4 or input("Configure bot? (y/n): ") == "y":
     file.close()
     file = open("info.txt", "w")
     text = []
@@ -20,6 +22,7 @@ if len(text)!= 4 or input("Configure bot? (y/n)") == "y":
         file.write(parameter + "\n")
 
     file.close()
+    
 
 comm_file = open("dank_commands.txt")
 command_list = comm_file.read().splitlines()
@@ -76,6 +79,8 @@ def reply_to_dank_memer(command):
     elif "trivia" in command:
         ans_choices = ['a', 'b', 'c', 'd']
         send_message(connect(), text[3], ans_choices[randint(0,3)])
+    elif "hunt" in command or "fish" in command or "dig" in command:
+        huntfishdig_response()
 
 def search_response(response_dict):
     response = response_dict[0]["content"]
@@ -89,7 +94,10 @@ def search_response(response_dict):
     search_options.append(response[(backticks[2]+1):backticks[3]])
     search_options.append(response[(backticks[4]+1):backticks[5]])
     print(search_options)
-    return search_options[randint(0,2)]
+    if "discord" in search_options:
+        search_options.remove("discord")
+        print("New search options: ", search_options)
+    return search_options[randint(0,len(search_options)-1)]
 
 def hl_response(response_dict):
     response = response_dict[0]["embeds"][0]["description"]
@@ -120,6 +128,29 @@ def pm_response():
             sleep(1)
             send_message(connect(), text[3], "pls buy laptop")
 
+def huntfishdig_response():
+    result_dict = get_response(connect(), text[3])
+    result_str = result_dict[0]["content"]
+    result_str = result_str.replace("\\ufeff", "")
+    result_str = result_str.replace("\\", "")
+    if "Type" in result_str:
+        backticks = [j for j, letter in enumerate(result_str) if letter == "`"]
+        type_this = result_str[(backticks[0]+1):backticks[1]]
+        print(type_this)
+        type_this = ''.join(c for c in type_this if c.isprintable())
+        print(type_this)
+        sleep(2)
+        send_message(connect(), text[3], type_this)
+
+keep_running = True
+
+def on_press(key):
+    global keep_running
+    if key == keyboard.Key.esc:
+        print("Ok, time to stop.")
+        keep_running = False
+        return False
+
 def main():
     while True:
         '''For testing
@@ -130,9 +161,13 @@ def main():
         '''
         for command in command_list:
             command = command.split("=")[0].strip()
+            if not keep_running:
+                return
             send_message(connect(), text[3], command)
             sleep(2)
             reply_to_dank_memer(command)
             sleep(randint(3,6))
 
+listener = keyboard.Listener(on_press=on_press)
+listener.start()
 main()

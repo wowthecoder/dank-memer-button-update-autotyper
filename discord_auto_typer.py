@@ -80,7 +80,7 @@ def reply_to_dank_memer(command):
         ans_choices = ['a', 'b', 'c', 'd']
         send_message(connect(), text[3], ans_choices[randint(0,3)])
     elif "hunt" in command or "fish" in command or "dig" in command:
-        huntfishdig_response()
+        huntfishdig_response(response_dict)
 
 def search_response(response_dict):
     response = response_dict[0]["content"]
@@ -128,12 +128,11 @@ def pm_response():
             sleep(1)
             send_message(connect(), text[3], "pls buy laptop")
 
-def huntfishdig_response():
-    result_dict = get_response(connect(), text[3])
+def huntfishdig_response(result_dict):
     result_str = result_dict[0]["content"]
     result_str = result_str.replace("\\ufeff", "")
     result_str = result_str.replace("\\", "")
-    if "Type" in result_str:
+    if "Type" in result_str or "Retype" in result_str:
         backticks = [j for j, letter in enumerate(result_str) if letter == "`"]
         type_this = result_str[(backticks[0]+1):backticks[1]]
         print(type_this)
@@ -141,6 +140,7 @@ def huntfishdig_response():
         print(type_this)
         sleep(2)
         send_message(connect(), text[3], type_this)
+        
 
 keep_running = True
 
@@ -161,13 +161,37 @@ def main():
         '''
         for command in command_list:
             command = command.split("=")[0].strip()
-            if not keep_running:
-                return
+            while not keep_running:
+                sleep(0.5)
             send_message(connect(), text[3], command)
             sleep(2)
             reply_to_dank_memer(command)
             sleep(randint(3,6))
 
+def capture_events():
+    while True:
+        while not keep_running:
+            sleep(0.5)
+        try:
+            event_dict = get_response(connect(), text[3])
+            event_str = event_dict[0]["content"]
+            event_str = event_str.replace("\\ufeff", "")
+            event_str = event_str.replace("\\", "")
+            if "Type" in event_str or "Retype" in event_str:
+                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
+                type_this = event_str[(backticks[0]+1):backticks[1]]
+                print(type_this)
+                type_this = ''.join(c for c in type_this if c.isprintable())
+                print(type_this)
+                sleep(1)
+                send_message(connect(), text[3], type_this)
+            sleep(2)
+        except:
+            pass
+
 listener = keyboard.Listener(on_press=on_press)
 listener.start()
-main()
+main_thread = threading.Thread(target=main)
+main_thread.start()
+event_thread = threading.Thread(target=capture_events)
+event_thread.start()

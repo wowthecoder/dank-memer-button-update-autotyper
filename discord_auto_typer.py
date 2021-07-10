@@ -6,12 +6,12 @@ import re
 from pynput import keyboard
 import threading
 
-file = open("info.txt")
+file = open("info_alt.txt")
 text = file.read().splitlines()
 
 if len(text)!= 4 or input("Configure bot? (y/n): ") == "y":
     file.close()
-    file = open("info.txt", "w")
+    file = open("info_alt.txt", "w")
     text = []
     text.append(input("User agent: "))
     text.append(input("Discord token: "))
@@ -79,67 +79,61 @@ def reply_to_dank_memer(command):
     elif "trivia" in command:
         ans_choices = ['a', 'b', 'c', 'd']
         send_message(connect(), text[3], ans_choices[randint(0,3)])
-    elif "hunt" in command or "fish" in command or "dig" in command:
-        huntfishdig_response(response_dict)
 
 def search_response(response_dict):
-    response = response_dict[0]["content"]
-    response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
-    response = response.replace("\\", "")
+    try:
+        response = response_dict[0]["content"]
+        response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
+        response = response.replace("\\", "")
 
-    search_options = []
-    #indexes of backticks
-    backticks = [i for i, letter in enumerate(response) if letter == '`']
-    search_options.append(response[(backticks[0]+1):backticks[1]])
-    search_options.append(response[(backticks[2]+1):backticks[3]])
-    search_options.append(response[(backticks[4]+1):backticks[5]])
-    print(search_options)
-    if "discord" in search_options:
-        search_options.remove("discord")
-        print("New search options: ", search_options)
-    return search_options[randint(0,len(search_options)-1)]
+        search_options = []
+        #indexes of backticks
+        backticks = [i for i, letter in enumerate(response) if letter == '`']
+        search_options.append(response[(backticks[0]+1):backticks[1]])
+        search_options.append(response[(backticks[2]+1):backticks[3]])
+        search_options.append(response[(backticks[4]+1):backticks[5]])
+        print(search_options)
+        if "discord" in search_options:
+            search_options.remove("discord")
+            print("New search options: ", search_options)
+        return search_options[randint(0,len(search_options)-1)]
+    except:
+        pass
 
 def hl_response(response_dict):
-    response = response_dict[0]["embeds"][0]["description"]
-    response = response.replace("\\ufeff", "")
-    response = response.replace("\\", "")
+    try:
+        response = response_dict[0]["embeds"][0]["description"]
+        response = response.replace("\\ufeff", "")
+        response = response.replace("\\", "")
 
-    bold_asterisks = [a.start() for a in re.finditer("\*\*", response)]
-    hint = int(response[(bold_asterisks[0]+2):bold_asterisks[1]])
-    if hint <= 50:
-        return "h"
-    else:
-        return "l"
+        bold_asterisks = [a.start() for a in re.finditer("\*\*", response)]
+        hint = int(response[(bold_asterisks[0]+2):bold_asterisks[1]])
+        if hint <= 50:
+            return "h"
+        else:
+            return "l"
+    except:
+        pass
 
 def pm_response():
-    pm_options = ['f', 'r', 'i', 'c', 'k']
-    send_message(connect(), text[3], pm_options[randint(0,4)])
-    sleep(3)
-    pm_result_dict = get_response(connect(), text[3])
-    pm_result = pm_result_dict[0]["content"]
-    if "is broken" in pm_result:
-        #check whether user still has laptops
-        send_message(connect(), text[3], "pls item laptop")
-        sleep(2)
-        laptop_reply_dict = get_response(connect(), text[3])
-        laptop_reply = laptop_reply_dict[0]["embeds"][0]["title"]
-        if "owned" not in laptop_reply:
-            send_message(connect(), text[3], "pls with 3500")
-            sleep(1)
-            send_message(connect(), text[3], "pls buy laptop")
-
-def huntfishdig_response(result_dict):
-    result_str = result_dict[0]["content"]
-    result_str = result_str.replace("\\ufeff", "")
-    result_str = result_str.replace("\\", "")
-    if "Type" in result_str or "Retype" in result_str:
-        backticks = [j for j, letter in enumerate(result_str) if letter == "`"]
-        type_this = result_str[(backticks[0]+1):backticks[1]]
-        print(type_this)
-        type_this = ''.join(c for c in type_this if c.isprintable())
-        print(type_this)
-        sleep(2)
-        send_message(connect(), text[3], type_this)
+    try:
+        pm_options = ['f', 'r', 'i', 'c', 'k']
+        send_message(connect(), text[3], pm_options[randint(0,4)])
+        sleep(3)
+        pm_result_dict = get_response(connect(), text[3])
+        pm_result = pm_result_dict[0]["content"]
+        if "is broken" in pm_result:
+            #check whether user still has laptops
+            send_message(connect(), text[3], "pls item laptop")
+            sleep(2)
+            laptop_reply_dict = get_response(connect(), text[3])
+            laptop_reply = laptop_reply_dict[0]["embeds"][0]["title"]
+            if "owned" not in laptop_reply:
+                send_message(connect(), text[3], "pls with 3500")
+                sleep(1)
+                send_message(connect(), text[3], "pls buy laptop")
+    except:
+        pass
         
 
 keep_running = True
@@ -161,23 +155,23 @@ def main():
         '''
         for command in command_list:
             command = command.split("=")[0].strip()
-            while not keep_running:
-                sleep(0.5)
+            if not keep_running:
+                return
             send_message(connect(), text[3], command)
             sleep(2)
-            reply_to_dank_memer(command)
+            reply_to_dank_memer(command) #sleep in this function, get the reply first
             sleep(randint(3,6))
 
 def capture_events():
     while True:
-        while not keep_running:
-            sleep(0.5)
+        if not keep_running:
+            return
         try:
             event_dict = get_response(connect(), text[3])
             event_str = event_dict[0]["content"]
             event_str = event_str.replace("\\ufeff", "")
             event_str = event_str.replace("\\", "")
-            if "Type" in event_str or "Retype" in event_str:
+            if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
                 backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
                 type_this = event_str[(backticks[0]+1):backticks[1]]
                 print(type_this)

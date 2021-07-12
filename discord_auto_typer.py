@@ -6,12 +6,12 @@ import re
 from pynput import keyboard
 import threading
 
-file = open("info_alt.txt")
+file = open("info.txt")
 text = file.read().splitlines()
 
 if len(text)!= 4 or input("Configure bot? (y/n): ") == "y":
     file.close()
-    file = open("info_alt.txt", "w")
+    file = open("info.txt", "w")
     text = []
     text.append(input("User agent: "))
     text.append(input("Discord token: "))

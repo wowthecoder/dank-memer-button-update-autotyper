@@ -82,7 +82,7 @@ def reply_to_dank_memer(command):
 
 def search_response(response_dict):
     try:
-        for i in range(6):
+        for i in range(5):
             response = response_dict[i]["content"]
             response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
             response = response.replace("\\", "")
@@ -105,7 +105,7 @@ def search_response(response_dict):
 
 def hl_response(response_dict):
     try:
-        for i in range(6):
+        for i in range(5):
             response = response_dict[i]["embeds"][0]["description"]
             response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
             response = response.replace("\\", "")
@@ -190,9 +190,9 @@ def capture_events():
                 if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
                     backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
                     type_this = event_str[(backticks[0]+1):backticks[1]]
-                    print(type_this)
+                    print(i, type_this)
                     type_this = ''.join(c for c in type_this if c.isprintable())
-                    print(type_this)
+                    print(i, type_this)
                     sleep(1)
                     send_message(connect(), text[3], type_this)
             sleep(2)

@@ -75,16 +75,19 @@ def reply_to_dank_memer(command):
     elif "hl" in command:
         send_message(connect(), text[3], hl_response(response_dict))
     elif "pm" in command:
-        pm_response()
+        pm_response(response_dict)
     elif "trivia" in command:
         ans_choices = ['a', 'b', 'c', 'd']
         send_message(connect(), text[3], ans_choices[randint(0,3)])
 
 def search_response(response_dict):
     try:
-        response = response_dict[0]["content"]
-        response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
-        response = response.replace("\\", "")
+        for i in range(6):
+            response = response_dict[i]["content"]
+            response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
+            response = response.replace("\\", "")
+            if "Pick from the list" in response:
+                break
 
         search_options = []
         #indexes of backticks
@@ -102,9 +105,12 @@ def search_response(response_dict):
 
 def hl_response(response_dict):
     try:
-        response = response_dict[0]["embeds"][0]["description"]
-        response = response.replace("\\ufeff", "")
-        response = response.replace("\\", "")
+        for i in range(6):
+            response = response_dict[i]["embeds"][0]["description"]
+            response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
+            response = response.replace("\\", "")
+            if "number secret" in response:
+                break
 
         bold_asterisks = [a.start() for a in re.finditer("\*\*", response)]
         hint = int(response[(bold_asterisks[0]+2):bold_asterisks[1]])
@@ -115,8 +121,17 @@ def hl_response(response_dict):
     except:
         pass
 
-def pm_response():
+def pm_response(response_dict):
     try:
+        response = response_dict[0]["content"]
+        response = response.replace("\\ufeff", "") #\\ufeff is a character called the Byte Order Mark, which is invisible
+        response = response.replace("\\", "")
+        if "you need to buy a laptop" in response:
+            print("BUY LAPTOP")
+            send_message(connect(), text[3], "pls with 3500")
+            sleep(1)
+            send_message(connect(), text[3], "pls buy laptop")
+        
         pm_options = ['f', 'r', 'i', 'c', 'k']
         send_message(connect(), text[3], pm_options[randint(0,4)])
         sleep(3)
@@ -168,17 +183,18 @@ def capture_events():
             return
         try:
             event_dict = get_response(connect(), text[3])
-            event_str = event_dict[0]["content"]
-            event_str = event_str.replace("\\ufeff", "")
-            event_str = event_str.replace("\\", "")
-            if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
-                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
-                type_this = event_str[(backticks[0]+1):backticks[1]]
-                print(type_this)
-                type_this = ''.join(c for c in type_this if c.isprintable())
-                print(type_this)
-                sleep(1)
-                send_message(connect(), text[3], type_this)
+            for i in range(3, -1, -1):
+                event_str = event_dict[i]["content"]
+                event_str = event_str.replace("\\ufeff", "")
+                event_str = event_str.replace("\\", "")
+                if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
+                    backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
+                    type_this = event_str[(backticks[0]+1):backticks[1]]
+                    print(type_this)
+                    type_this = ''.join(c for c in type_this if c.isprintable())
+                    print(type_this)
+                    sleep(1)
+                    send_message(connect(), text[3], type_this)
             sleep(2)
         except:
             pass

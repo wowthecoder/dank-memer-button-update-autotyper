@@ -183,7 +183,7 @@ def capture_events():
             return
         try:
             event_dict = get_response(connect(), text[3])
-            for i in range(3, -1, -1):
+            for i in range(2, -1, -1):
                 event_str = event_dict[i]["content"]
                 event_str = event_str.replace("\\ufeff", "")
                 event_str = event_str.replace("\\", "")

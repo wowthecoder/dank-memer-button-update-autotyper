@@ -183,7 +183,7 @@ def capture_events():
             return
         try:
             event_dict = get_response(connect(), text[3])
-            event_str = event_dict[i]["content"]
+            event_str = event_dict[0]["content"]
             event_str = event_str.replace("\\ufeff", "")
             event_str = event_str.replace("\\", "")
             if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
@@ -192,7 +192,7 @@ def capture_events():
                 type_this = ''.join(c for c in type_this if c.isprintable())
                 sleep(1)
                 send_message(connect(), text[3], type_this)
-            sleep(2)
+            sleep(1)
         except:
             pass
 

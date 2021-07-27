@@ -183,18 +183,15 @@ def capture_events():
             return
         try:
             event_dict = get_response(connect(), text[3])
-            for i in range(2, -1, -1):
-                event_str = event_dict[i]["content"]
-                event_str = event_str.replace("\\ufeff", "")
-                event_str = event_str.replace("\\", "")
-                if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
-                    backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
-                    type_this = event_str[(backticks[0]+1):backticks[1]]
-                    print(i, type_this)
-                    type_this = ''.join(c for c in type_this if c.isprintable())
-                    print(i, type_this)
-                    sleep(1)
-                    send_message(connect(), text[3], type_this)
+            event_str = event_dict[i]["content"]
+            event_str = event_str.replace("\\ufeff", "")
+            event_str = event_str.replace("\\", "")
+            if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
+                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
+                type_this = event_str[(backticks[0]+1):backticks[1]]
+                type_this = ''.join(c for c in type_this if c.isprintable())
+                sleep(1)
+                send_message(connect(), text[3], type_this)
             sleep(2)
         except:
             pass

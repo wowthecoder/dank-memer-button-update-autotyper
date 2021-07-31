@@ -78,7 +78,7 @@ def main():
         fields = response_dict[0]["embeds"][0]["fields"][0]["value"]
 
         #Get the number of items
-        item_count = list(map(lambda x: int(x.replace(",", "")), re.findall(r'\d+[0-9,]+', fields))) #to include commas becuz dank memer is annoying this way
+        item_count = list(map(lambda x: int(x.replace(",", "")), re.findall(r'\d+[0-9,]*', fields))) #to include commas becuz dank memer is annoying this way
         #remove all ids of emojis
         item_count = [count for count in item_count if count < 150000]
         print(item_count)

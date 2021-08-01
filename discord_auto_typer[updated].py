@@ -126,9 +126,14 @@ def pm_response(response_dict):
         result_msg = result_dict[0]["embeds"][0]["description"]
         print(result_msg)
         if "broke" in result_msg:
-            send_message(connect(), text[4], "pls with 5000")
+            send_message(connect(), text[4], "pls item laptop")
             sleep(2)
-            send_message(connect(), text[4], "pls buy laptop")
+            laptop_reply_dict = get_response(connect(), text[4])
+            laptop_reply = laptop_reply_dict[0]["embeds"][0]["title"]
+            if "owned" not in laptop_reply:
+                send_message(connect(), text[4], "pls with 5000")
+                sleep(1)
+                send_message(connect(), text[4], "pls buy laptop")
     except:
         pass
 

@@ -15,3 +15,5 @@ The first time you run the program, the program will prompt you to enter the 5 t
 5. Discord Channel ID
    - That's the string of numbers that is at the last part of the Discord Channel URL.
    - Eg. if channel url = "https://discord.com/channels/238746123/8937492374" then the channel ID would be 8937492374
+\[Works in both browser and desktop Discord app\]
+\[You don't have to stay in the Discord window/tab for it to work, this script will not interfere with your keyboard and mouse.\]

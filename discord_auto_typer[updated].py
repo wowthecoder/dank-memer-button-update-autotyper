@@ -5,6 +5,7 @@ from random import randint
 import re
 from pynput import keyboard
 import threading
+from win10toast_click import ToastNotifier
 
 file = open("info.txt")
 text = file.read().splitlines()
@@ -71,12 +72,18 @@ def get_response(connection, channel_id):
 def reply_to_dank_memer(command):
     response_dict = get_response(connect(), text[4])
 
-    if "search" in command or "crime" in command or "trivia" in command:
-        search_crime_trivia_response(response_dict)
+    if "search" in command:
+        search_response(response_dict)
+    elif "crime" in command:
+        crime_response(response_dict)
+    elif "trivia" in command:
+        trivia_response(response_dict)
     elif "pm" in command:
         pm_response(response_dict)
     elif "hl" in command:
         hl_response(response_dict)
+    elif "fish" in command or "dig" in command:
+        fish_dig_response(response_dict)
 
 def press_button(connection, channel_id, guild_id, message_id, button_id, button_hash):
     button_data = {
@@ -99,11 +106,48 @@ def press_button(connection, channel_id, guild_id, message_id, button_id, button
     except:
         print("Failed to press button")
     
-def search_crime_trivia_response(response_dict):
+#separate search response to prioritise area51, grass, and mels room
+def search_response(response_dict):
     try:
         message_id = response_dict[0]["id"]
-        search_options = response_dict[0]["components"][0]["components"] #Options are in the array of dictionary of button info
-        choice = search_options[randint(0,len(search_options)-1)]
+        search_options = response_dict[0]["components"][0]["components"]
+        option_labels = []
+        for i in range(len(search_options)):
+            option_labels.append(search_options[i]["label"])
+        print(option_labels)
+        if "area51" in option_labels:
+            choice = search_options[option_labels.index("area51")]
+        elif "grass" in option_labels:
+            choice = search_options[option_labels.index("grass")]
+        elif "mels room" in option_labels:
+            choice = search_options[option_labels.index("mels room")]
+        else:
+            choice = search_options[randint(0, len(search_options)-1)]
+        press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
+    except Exception as e:
+        print("Encountered exception:", e)
+
+#separate crime response to prioritise tax evasion for badosz card
+def crime_response(response_dict):
+    try:
+        message_id = response_dict[0]["id"]
+        crime_options = response_dict[0]["components"][0]["components"]
+        option_labels = []
+        for i in range(len(crime_options)):
+            option_labels.append(crime_options[i]["label"])
+        if "tax evasion" in option_labels:
+            choice = crime_options[option_labels.index("tax evasion")]
+        else:
+            choice = crime_options[randint(0, len(crime_options)-1)]
+        press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
+    except:
+        pass
+
+def trivia_response(response_dict):
+    try:
+        message_id = response_dict[0]["id"]
+        answer_options = response_dict[0]["components"][0]["components"] #Options are in the array of dictionary of button info
+        choice = answer_options[randint(0,len(answer_options)-1)]
         #now press the button
         press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
     except:
@@ -152,6 +196,15 @@ def hl_response(response_dict):
     except:
         pass
         
+def fish_dig_response(response_dict):
+    try:
+        reply_content = response_dict[0]["content"]
+        if "fish is too strong" in reply_content or "what's in the dirt" in reply_content:
+            if "Type" not in reply_content or "reverse" not in reply_content:
+                toaster = ToastNotifier()
+                toaster.show_toast("Caught something in fish or dig", "Needs human intervention", duration=10, threaded=False)
+    except:
+        pass
 
 keep_running = True
 
@@ -164,9 +217,9 @@ def on_press(key):
 
 def main():
     '''For testing
-    send_message(connect(), text[4], "pls beg")
+    send_message(connect(), text[4], "pls search")
     sleep(2)
-    reply_to_dank_memer("pls beg")
+    reply_to_dank_memer("pls search")
     sleep(randint(29, 35))
     '''
     while True:
@@ -196,6 +249,15 @@ def capture_events():
                 print(type_this)
                 sleep(1)
                 send_message(connect(), text[4], type_this)
+            if "reverse" in event_str:
+                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
+                reverse_this = event_str[(backticks[0]+1):backticks[1]]
+                print(reverse_this)
+                reverse_this = ''.join(c for c in reverse_this if c.isprintable())
+                reverse_this = reverse_this[::-1]
+                print(reverse_this)
+                sleep(1)
+                send_message(connect(), text[4], reverse_this)
             sleep(1)
         except:
             pass

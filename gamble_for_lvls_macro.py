@@ -1,18 +1,19 @@
 from http.client import HTTPSConnection
 import json
-from time import sleep
+import time
 from random import randint
 import re
 from pynput import keyboard
 import threading
 from win10toast_click import ToastNotifier
+from datetime import datetime
 
-file = open("info_alt.txt")
+file = open("info.txt")
 text = file.read().splitlines()
 
 if len(text)!= 5 or input("Configure bot? (y/n): ") == "y":
     file.close()
-    file = open("info_alt.txt", "w")
+    file = open("info.txt", "w")
     text = []
     text.append(input("User agent: "))
     text.append(input("Discord token: "))
@@ -24,10 +25,6 @@ if len(text)!= 5 or input("Configure bot? (y/n): ") == "y":
         file.write(parameter + "\n")
 
     file.close()
-    
-
-comm_file = open("dank_commands.txt")
-command_list = comm_file.read().splitlines()
 
 header_data = {
     "content-type": "application/json",
@@ -72,18 +69,14 @@ def get_response(connection, channel_id):
 def reply_to_dank_memer(command):
     response_dict = get_response(connect(), text[4])
 
-    if "search" in command:
-        search_response(response_dict)
-    elif "crime" in command:
-        crime_response(response_dict)
-    elif "trivia" in command:
-        trivia_response(response_dict)
+    if "search" in command or "crime" in command:
+        search_crime_response(response_dict)
     elif "pm" in command:
-        pm_response(response_dict, 0)
+        pm_response(response_dict)
     elif "hl" in command:
         hl_response(response_dict)
-    elif "fish" in command or "dig" in command:
-        fish_dig_response(response_dict)
+    elif "scratch" in command:
+        scratch_response(response_dict)
 
 def press_button(connection, channel_id, guild_id, message_id, button_id, button_hash):
     button_data = {
@@ -105,93 +98,53 @@ def press_button(connection, channel_id, guild_id, message_id, button_id, button
             print(f"While pressing button, received HTTP {response.status}: {response.reason}")
     except:
         print("Failed to press button")
-    
-#separate search response to prioritise area51, grass, and mels room
-def search_response(response_dict):
-    try:
-        print(response_dict)
-        message_id = response_dict[0]["id"]
-        search_options = response_dict[0]["components"][0]["components"]
-        option_labels = []
-        for i in range(len(search_options)):
-            option_labels.append(search_options[i]["label"])
-        print(option_labels)
-        if "area51" in option_labels:
-            choice = search_options[option_labels.index("area51")]
-        elif "grass" in option_labels:
-            choice = search_options[option_labels.index("grass")]
-        elif "mels room" in option_labels:
-            choice = search_options[option_labels.index("mels room")]
-        else:
-            choice = search_options[randint(0, len(search_options)-1)]
-        press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
-    except Exception as e:
-        if len(response_dict[1]["components"]) > 0:
-            if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                search_response(response_dict[1:])
-        print("Encountered exception during search:", e)
 
-#separate crime response to prioritise tax evasion for badosz card
-def crime_response(response_dict):
+def scratch_response(response_dict):
     try:
         message_id = response_dict[0]["id"]
-        crime_options = response_dict[0]["components"][0]["components"]
-        option_labels = []
-        for i in range(len(crime_options)):
-            option_labels.append(crime_options[i]["label"])
-        if "tax evasion" in option_labels:
-            choice = crime_options[option_labels.index("tax evasion")]
-        else:
-            choice = crime_options[randint(0, len(crime_options)-1)]
-        press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
-    except Exception as e:
+        buttons = []
+        for row in response_dict[0]["components"]:
+            for btn in row["components"]:
+                buttons.append(btn)
+        for i in range(3):
+            choice = buttons[randint(0, len(buttons)-1)]
+            press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
+            buttons.remove(choice)
+            time.sleep(0.5)
+    except ValueError as e:
+        print(e)
         if len(response_dict[1]["components"]) > 0:
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                crime_response(response_dict[1:])
-        print("Encountered exception during crime:", e)
-
-def trivia_response(response_dict):
+                scratch_response(response_dict[1:])
+        
+def search_crime_response(response_dict):
     try:
         message_id = response_dict[0]["id"]
         answer_options = response_dict[0]["components"][0]["components"] #Options are in the array of dictionary of button info
         choice = answer_options[randint(0,len(answer_options)-1)]
         #now press the button
         press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
-    except Exception as e:
-        if len(response_dict[1]["components"]) > 0 and len(response_dict[1]["embeds"]) > 0:
+    except:
+        if len(response_dict[1]["components"]) > 0:
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                trivia_response(response_dict[1:])
-        print("Encountered exception during trivia:", e)
+                search_crime_response(response_dict[1:])
 
-def pm_response(response_dict, i):
+def pm_response(response_dict):
     try:
-        response = response_dict[i]["content"]
+        response = response_dict[0]["content"]
         if "need to buy" in response:
             send_message(connect(), text[4], "pls with 5000")
             time.sleep(2)
             send_message(connect(), text[4], "pls buy laptop")
-        message_id = response_dict[i]["id"]
-        pm_options = response_dict[i]["components"][0]["components"]
+        message_id = response_dict[0]["id"]
+        pm_options = response_dict[0]["components"][0]["components"]
         choice = pm_options[randint(0, len(pm_options)-1)]
         #now press the button
         press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
-        sleep(1)
-        result_dict = get_response(connect(), text[4])
-        result_msg = result_dict[i]["embeds"][0]["description"]
-        if "broke" in result_msg:
-            send_message(connect(), text[4], "pls item laptop")
-            sleep(2)
-            laptop_reply_dict = get_response(connect(), text[4])
-            laptop_reply = laptop_reply_dict[0]["embeds"][0]["title"]
-            if "owned" not in laptop_reply:
-                send_message(connect(), text[4], "pls with 5000")
-                sleep(1)
-                send_message(connect(), text[4], "pls buy laptop")
-    except Exception as e:
-        if len(response_dict[1]["components"]) > 0 and len(response_dict[1]["embeds"]) > 0:
+    except:
+        if len(response_dict[1]["components"]) > 0:
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                pm_response(response_dict, 1)
-        print("Encountered exception during postmemes:", e)
+                pm_response(response_dict[1:])
 
 def hl_response(response_dict):
     try:
@@ -205,60 +158,90 @@ def hl_response(response_dict):
         else:
             high_button = response_dict[0]["components"][0]["components"][2]
             press_button(connect(), text[4], text[3], message_id, high_button["custom_id"], high_button["hash"])
-    except Exception as e:
-        if len(response_dict[1]["components"]) > 0 and len(response_dict[1]["embeds"]) > 0:
+    except:
+        if len(response_dict[1]["components"]) > 0:
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                trivia_response(response_dict[1:])
-        print("Encountered exception during highlow:", e)
-        
-def fish_dig_response(response_dict):
-    try:
-        reply_content = response_dict[0]["content"]
-        if "fish is too strong" in reply_content or "what's in the dirt" in reply_content:
-            #if "Type" not in reply_content and "reverse" not in reply_content:
-            toaster = ToastNotifier()
-            toaster.show_toast("Caught something in fish or dig", "Needs human intervention", duration=10, threaded=False)
-    except Exception as e:
-        print("Encountered exception during fish or dig:", e)
+                hl_response(response_dict[1:])
 
 keep_running = True
+open_daily = True
+command_list = ["pls with 4003=2", "pls se 1001=3", "pls gamble 1001=2", "pls slots max=2", "pls scratch 1001=2", "pls dep all=2"]
+daily_duration = time.time() - 601
 
 def on_press(key):
-    global keep_running
-    if key == keyboard.Key.esc:
-        print("Ok, time to stop.")
-        keep_running = False
-        return False
+    global keep_running, open_daily
+    try:
+        if key.char == '$':
+            print("Welp, I will stop opening daily boxes.")
+            open_daily = False
+    except AttributeError:
+        if key == keyboard.Key.esc:
+            print("Ok, time to stop.")
+            keep_running = False
+            return False
 
 def main():
+    '''
     #For testing
-    send_message(connect(), text[4], "pls search")
-    sleep(2)
-    reply_to_dank_memer("pls search")
-    sleep(randint(29, 35))
+    send_message(connect(), text[4], "pls scratch 1001")
+    time.sleep(2)
+    reply_to_dank_memer("pls scratch 1001")
+    #time.sleep(randint(29, 35))
     '''
-    beg_now = True #This boolean is to control the beg command to be sent once in 2 rounds to maximise xp earned(since beg command takes 45 sec while others take 30 sec)
+    search_cooldown = time.time() - 31
+    crime_cooldown = time.time() - 46
+    beg_cooldown = time.time() - 46
+    pm_cooldown = time.time() - 41
+    hl_cooldown = time.time() - 31
     while True:
+        if not keep_running:
+            return
+        if time.time() - daily_duration > 600 and open_daily is True: #The response captured in the event thread
+            send_message(connect(), text[4], "pls use daily")
+            time.sleep(2)
+
         for command in command_list:
-            if not keep_running:
-                return
-            command = command.split("=")[0].strip()
-            if "beg" in command:
-                if not beg_now:
-                    beg_now = True
-                    continue
-                else:
-                    beg_now = False
-            send_message(connect(), text[4], command)
-            if "dep" not in command or "beg" not in command:
-                sleep(2)
-                reply_to_dank_memer(command) #sleep in this function, get the reply first
-            sleep(randint(2,4))
-    '''
+            command_text = command.split("=")[0]
+            command_wait = int(command.split("=")[1])
+            send_message(connect(), text[4], command_text)
+            time.sleep(command_wait)
+            if "scratch" in command_text:
+                reply_to_dank_memer(command_text)
+                time.sleep(1)
+        if time.time() - search_cooldown > 30:
+            send_message(connect(), text[4], "pls search")
+            search_cooldown = time.time()
+            time.sleep(2)
+            reply_to_dank_memer("pls search")
+            time.sleep(1)
+        if time.time() - crime_cooldown > 45:
+            send_message(connect(), text[4], "pls crime")
+            crime_cooldown = time.time()
+            time.sleep(2)
+            reply_to_dank_memer("pls crime")
+            time.sleep(1)
+        if time.time() - beg_cooldown > 45:
+            send_message(connect(), text[4], "pls beg")
+            beg_cooldown = time.time()
+            time.sleep(1)
+        if time.time() - pm_cooldown > 40:
+            send_message(connect(), text[4], "pls pm")
+            pm_cooldown = time.time()
+            time.sleep(2)
+            reply_to_dank_memer("pls pm")
+            time.sleep(1)
+        if time.time() - hl_cooldown > 30:
+            send_message(connect(), text[4], "pls hl")
+            hl_cooldown = time.time()
+            time.sleep(2)
+            reply_to_dank_memer("pls hl")
+            time.sleep(1)
+ 
 def capture_events():
     while True:
         if not keep_running:
             return
+        global daily_duration
         try:
             event_dict = get_response(connect(), text[4])
             event_str = event_dict[0]["content"]
@@ -270,18 +253,15 @@ def capture_events():
                 print(type_this)
                 type_this = ''.join(c for c in type_this if c.isprintable())
                 print(type_this)
-                sleep(1)
+                time.sleep(1)
                 send_message(connect(), text[4], type_this)
-            if "reverse" in event_str:
-                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
-                reverse_this = event_str[(backticks[0]+1):backticks[1]]
-                print(reverse_this)
-                reverse_this = ''.join(c for c in reverse_this if c.isprintable())
-                reverse_this = reverse_this[::-1]
-                print(reverse_this)
-                sleep(1)
-                send_message(connect(), text[4], reverse_this)
-            sleep(1)
+            if "Box Contents" in event_str or "Opening Daily Box" in event_str:
+                print(event_str)
+                daily_duration = time.time()
+                print("Ok daily opened at:", datetime.now())
+            if "active right now" in event_str:
+                daily_duration = time.time()
+            time.sleep(1)
         except:
             pass
 

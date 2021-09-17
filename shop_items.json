@@ -1,0 +1,176 @@
+{
+	"https://cdn.discordapp.com/emojis/834192945019617280.png":  
+	{
+		"name": "pink phallic object"
+		"type": "collectable"
+		"cost": "10"
+	}
+	"https://cdn.discordapp.com/emojis/830509316632346625.png":
+	{
+		"name": "cell phone"
+		"type": "tool"
+		"cost": "3,500"
+	}
+	"https://cdn.discordapp.com/emojis/830509316900651059.png":
+	{
+		"name": "padlock"
+		"type": "tool"
+		"cost": "4,000"
+	}
+	"https://cdn.discordapp.com/emojis/830509316674813974.png":
+	{
+		"name": "laptop"
+		"type": "tool"
+		"cost": "5,000"
+	}
+	"https://cdn.discordapp.com/emojis/830509316901175366.png":
+	{
+		"name": "box of sand"
+		"type": "tool"
+		"cost": "5,000"
+	}
+	"https://cdn.discordapp.com/emojis/887000049266069575.png":
+	{
+		"name": "apple"
+		"type": "power-up"
+		"cost": "8,000"
+	}
+	"https://cdn.discordapp.com/emojis/887000049354145792.png":
+	{
+		"name": "landmine"
+		"type": "tool"
+		"cost": "9,500"
+	}
+	"https://cdn.discordapp.com/emojis/573151946911776798.png":
+	{
+		"name": "fake id"
+		"type": "tool"
+		"cost": "10,000"
+	}
+	"https://cdn.discordapp.com/emojis/887000049555501127.png":
+	{
+		"name": "alcohol"
+		"type": "power-up"
+		"cost": "12,000"
+	}
+	"https://cdn.discordapp.com/emojis/813911522975678476.png":
+	{
+		"name": "lucky horseshoe"
+		"type": "power-up"
+		"cost": "25,000"
+	}
+	"https://cdn.discordapp.com/emojis/573150030030962699.png":
+	{
+		"name": "fidget spinner"
+		"type": "power-up"
+		"cost": "25,000"
+	}
+	"https://cdn.discordapp.com/emojis/842779232819478619.png":
+	{
+		"name": "shovel"
+		"type": "tool"
+		"cost": "25,000"
+	}
+	"https://cdn.discordapp.com/emojis/714998788397465732.png":
+	{
+		"name": "fishing pole"
+		"type": "tool"
+		"cost": "25,000"
+	}
+	"https://cdn.discordapp.com/emojis/714543607947722822.png":
+	{
+		"name": "hunting rifle"
+		"type": "tool"
+		"cost": "25,000"
+	}
+	"https://cdn.discordapp.com/emojis/688456543372312594.png":
+	{
+		"name": "coin bomb"
+		"type": "tool"
+		"cost": "30,000"
+	}
+	"https://cdn.discordapp.com/emojis/573151706641203210.png":
+	{
+		"name": "life saver"
+		"type": "power-up"
+		"cost": "30,000"
+	}
+	"https://cdn.discordapp.com/emojis/887000049740030032.png":
+	{
+		"name": "tidepod"
+		"type": "power-up"
+		"cost": "30,000"
+	}	
+	"https://cdn.discordapp.com/emojis/723641465615548447.png":
+	{
+		"name": "robbers wishlist"
+		"type": "tool"
+		"cost": "50,000"
+	}
+	"https://cdn.discordapp.com/emojis/830509316933943307.png":
+	{
+		"name": "shredded cheese"
+		"type": "power-up"
+		"cost": "70,000"
+	}
+	"https://cdn.discordapp.com/emojis/668945671427981312.gif":
+	{
+		"name": "rare pepe"
+		"type": "collectable"
+		"cost": "75,000"
+	}
+	"https://cdn.discordapp.com/emojis/788070334640422942.png":
+	{
+		"name": "pizza slice"
+		"type": "power-up"
+		"cost": "250,000"
+	}
+	"https://cdn.discordapp.com/emojis/862369027984064552.png":
+	{
+		"name": "engagement ring"
+		"type": "collectable"
+		"cost": "350,000"
+	}
+	"https://cdn.discordapp.com/emojis/873172443529891871.png":
+	{
+		"name": "new player pack"
+		"type": "item pack"
+		"cost": "1,000"
+	}
+	"https://cdn.discordapp.com/emojis/873172443462791200.png":
+	{
+		"name": "anti-rob pack"
+		"type": "item pack"
+		"cost": "1,000"
+	}
+	"https://cdn.discordapp.com/emojis/873172443685064744.png":
+	{
+		"name": "grind pack"
+		"type": "item pack"
+		"cost": "1,000"
+	}
+	"https://cdn.discordapp.com/emojis/718138332982280272.gif":
+	{
+		"name": "pepe coin"
+		"type": "collectable"
+		"cost": "625,000"
+	}
+	"https://cdn.discordapp.com/emojis/716848179022397462.gif":
+	{
+		"name": "pepe medal"
+		"type": "collectable"
+		"cost": "10,000,000"
+	}
+	"https://cdn.discordapp.com/emojis/718136428219072662.gif":
+	{
+		"name": "pepe trophy"
+		"type": "collectable"
+		"cost": "50,000,000"
+	}
+	"https://cdn.discordapp.com/emojis/834862725120917544.png":
+	{
+		"name": "pepe crown"
+		"type": "collectable"
+		"cost": "250,000,000"
+	}
+}

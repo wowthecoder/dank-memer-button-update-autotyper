@@ -212,11 +212,11 @@ def main():
     while True:
         if not keep_running:
             return
-        '''
+
         if time.time() - daily_duration > 600 and open_daily is True: #The response captured in the event thread
             send_message(connect(), text[4], "pls use daily")
             time.sleep(2)
-        '''
+
         for command in gamble_list:
             command_text = command.split("=")[0]
             command_wait = int(command.split("=")[1])
@@ -303,7 +303,7 @@ def capture_events():
                             if button["label"].lower() == item_info[wanted_property]:
                                 answer_button = button
                                 break
-                        press_event_button(connect(), text[3], text[4], message_id, answer_button["custom_id"])
+                        press_button(connect(), text[3], text[4], message_id, answer_button["custom_id"])
                     else:
                         choice = button_options[randint(0, len(button_options)-1)]
                         press_button(connect(), text[4], text[3], message_id, choice["custom_id"]) 

@@ -295,10 +295,11 @@ def capture_events():
                     hl_response(event_dict)
                 elif any(phrase in embed_description for phrase in shop_sales):
                     print("Yooo it's SHOP SALE mannnnn")
-                    if event_embed["thumbnail"] in shop_item_dict:
-                        item_info = shop_item_dict[event_embed["thumbnail"]]
+                    if event_embed["image"]["url"] in shop_item_dict:
+                        item_info = shop_item_dict[event_embed["image"]["url"]]
                         bold_asterisks = [a.start() for a in re.finditer("\*\*", embed_description)]
                         wanted_property = embed_description[(bold_asterisks[0]+2):bold_asterisks[1]] #name, cost, or type
+                        print("wanted property:", wanted_property)
                         for button in button_options:
                             if button["label"].lower() == item_info[wanted_property]:
                                 answer_button = button

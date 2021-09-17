@@ -169,8 +169,8 @@
 	},
 	"https://cdn.discordapp.com/emojis/834862725120917544.png":
 	{
-		"name": "pepe crown"
-		"type": "collectable"
+		"name": "pepe crown",
+		"type": "collectable",
 		"cost": "250,000,000"
 	}
 }

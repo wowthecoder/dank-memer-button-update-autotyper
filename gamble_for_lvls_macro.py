@@ -29,6 +29,8 @@ if len(text)!= 5 or input("Configure bot? (y/n): ") == "y":
 with open("shop_items.json", "r") as f:
     shop_item_dict = json.load(f)
 
+with open("trivia_answers.json", "r") as f:
+    trivia_answers_map = json.load(f)
 
 header_data = {
     "content-type": "application/json",
@@ -81,8 +83,8 @@ def reply_to_dank_memer(command):
         hl_response(response_dict)
     elif "scratch" in command:
         scratch_response(response_dict)
-    elif "fish" in command or "hunt" in command:
-        hunt_fish_response(response_dict)
+    elif "hunt" in command or "fish" in command or "dig" in command:
+        hunt_fish_dig_response(response_dict)
 
 def press_button(connection, guild_id, channel_id, message_id, button_id, button_hash):
     button_data = {
@@ -169,11 +171,11 @@ def hl_response(response_dict):
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
                 hl_response(response_dict[1:])
 
-def hunt_fish_response(response_dict):
+def hunt_fish_dig_response(response_dict):
     try:
         reply_content = response_dict[0]["content"]
-        minigame = ["Dodge the the Fireball", "Catch the fish"]
-        if any(phrase in reply_content for phrase in minigame):
+        minigames_or_ping = ["Dodge the the Fireball", "Catch the fish", "<@!484673336534892546>"]
+        if any(phrase in reply_content for phrase in minigames_or_ping):
             print(reply_content)
             toaster = ToastNotifier()
             toaster.show_toast("Caught something in hunt or fish", "Needs human intervention", duration=10, threaded=False)
@@ -199,11 +201,11 @@ def on_press(key):
             return False
 
 def main():
-    '''
+    '''   
     #For testing
-    send_message(connect(), text[4], "pls slots max")
-    time.sleep(2)
-    reply_to_dank_memer("pls slots max")
+    send_message(connect(), text[4], "pls trivia")
+    #time.sleep(2)
+    #reply_to_dank_memer("pls slots max")
     #time.sleep(randint(29, 35))
     '''
     loop_count = 0
@@ -281,7 +283,6 @@ def capture_events():
             if "active right now" in daily_str:
                 daily_duration = time.time()
 
-            is_event = False
             message_id = event_dict[0]["id"]
             shop_sales = ["What is the **type**", "What is the **name**", "What is the **cost**"]
             if len(event_dict[0]["components"]) > 0 and len(event_dict[0]["components"][0]["components"]) == 1: #Boss fight
@@ -304,22 +305,33 @@ def capture_events():
                             if button["label"].lower() == item_info[wanted_property]:
                                 answer_button = button
                                 break
-                        press_button(connect(), text[3], text[4], message_id, answer_button["custom_id"])
+                        press_event_button(connect(), text[3], text[4], message_id, answer_button["custom_id"])
                     else:
+                        print("Eh I found no answer")
                         choice = button_options[randint(0, len(button_options)-1)]
-                        press_button(connect(), text[4], text[3], message_id, choice["custom_id"]) 
+                        press_event_button(connect(), text[3], text[4], message_id, choice["custom_id"]) 
                 elif "seconds to answer" in embed_description:
-                    is_event = True
                     print("Trivia night boiiiiiiiiiiii")
-                    choice = button_options[randint(0, len(button_options)-1)]
-                    press_button(connect(), text[4], text[3], message_id, choice["custom_id"])
+                    button_options = event_dict[0]["components"][0]["components"]
+                    #Get the category
+                    category = event_dict[0]["embeds"][0]["fields"][1]["value"][1:-1]
+                    print(category)
+                    question = event_dict[0]["embeds"][0]["description"]
+                    bold_asterisks = [a.start() for a in re.finditer("\*\*", question)]
+                    question = question[(bold_asterisks[0]+2):bold_asterisks[1]]
+                    if category in trivia_answers_map and question in trivia_answers_map[category]:
+                        print("Found trivia answer")
+                        answer_text = trivia_answers_map[category][question]
+                        ans_btn = button_options[0] #fail safe
+                        for button in button_options:
+                            if button["label"] == answer_text:
+                                choice = button
+                                break  
+                    else:
+                        print("Can't find answer for trivia soz")
+                        choice = button_options[randint(0, len(button_options)-1)]
+                    press_event_button(connect(), text[3], text[4], message_id, choice["custom_id"])
                         
-            if is_event is True:
-                is_event = False
-                events.append(event_dict[0])
-                with open("events.json", "w") as event_file:
-                    json.dump(events, event_file, indent=4)
-                print("Event written to file")
             time.sleep(1)
         except Exception as e:
             print("Encountered exception while capturing events:", e)

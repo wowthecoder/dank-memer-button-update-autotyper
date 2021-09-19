@@ -53,7 +53,7 @@
 		"type": "power-up",
 		"cost": "12,000"
 	},
-	"https://cdn.discordapp.com/emojis/813911522975678476.png":
+	"https://cdn.discordapp.com/attachments/693517202879414312/813911606907240448/horseshoe.png":
 	{
 		"name": "lucky horseshoe",
 		"type": "power-up",
@@ -119,7 +119,7 @@
 		"type": "collectable",
 		"cost": "75,000"
 	},
-	"https://cdn.discordapp.com/emojis/788070334640422942.png":
+	"https://cdn.discordapp.com/attachments/693517202879414312/788070266579189790/pizza-export2.png":
 	{
 		"name": "pizza slice",
 		"type": "power-up",

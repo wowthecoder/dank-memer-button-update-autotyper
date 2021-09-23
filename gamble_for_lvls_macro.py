@@ -75,8 +75,10 @@ def get_response(connection, channel_id):
 def reply_to_dank_memer(command):
     response_dict = get_response(connect(), text[4])
 
-    if "search" in command or "crime" in command:
-        search_crime_response(response_dict)
+    if "search" in command:
+        search_response(response_dict)
+    elif "crime" in command:
+        crime_response(response_dict)
     elif "pm" in command:
         pm_response(response_dict)
     elif "hl" in command:
@@ -125,17 +127,47 @@ def scratch_response(response_dict):
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
                 scratch_response(response_dict[1:])
         
-def search_crime_response(response_dict):
+#separate search response to prioritise area51, grass, and mels room
+def search_response(response_dict):
     try:
         message_id = response_dict[0]["id"]
-        answer_options = response_dict[0]["components"][0]["components"] #Options are in the array of dictionary of button info
-        choice = answer_options[randint(0,len(answer_options)-1)]
-        #now press the button
+        search_options = response_dict[0]["components"][0]["components"]
+        option_labels = []
+        for i in range(len(search_options)):
+            option_labels.append(search_options[i]["label"])
+        print(option_labels)
+        if "grass" in option_labels:
+            choice = search_options[option_labels.index("grass")]
+        elif "mels room" in option_labels:
+            choice = search_options[option_labels.index("mels room")]
+        else:
+            choice = search_options[randint(0, len(search_options)-1)]
         press_button(connect(), text[3], text[4], message_id, choice["custom_id"], choice["hash"])
-    except:
+    except Exception as e:
         if len(response_dict[1]["components"]) > 0:
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                search_crime_response(response_dict[1:])
+                search_response(response_dict[1:])
+        print("Encountered exception during search:", e)
+
+#separate crime response to prioritise tax evasion for badosz card
+def crime_response(response_dict):
+    try:
+        message_id = response_dict[0]["id"]
+        crime_options = response_dict[0]["components"][0]["components"]
+        option_labels = []
+        for i in range(len(crime_options)):
+            option_labels.append(crime_options[i]["label"])
+        if "devious lick" in option_labels:
+            choice = crime_options[option_labels.index("devious lick")]
+        elif "tax evasion" in option_labels:
+            choice = crime_options[option_labels.index("tax evasion")]
+        else:
+            choice = crime_options[randint(0, len(crime_options)-1)]
+        press_button(connect(), text[3], text[4], message_id, choice["custom_id"], choice["hash"])
+    except Exception as e:
+        if len(response_dict[1]["components"]) > 0:
+            if "disabled" not in response_dict[1]["components"][0]["components"][0]:
+                crime_response(response_dict[1:])
 
 def pm_response(response_dict):
     try:
@@ -174,8 +206,8 @@ def hl_response(response_dict):
 def hunt_fish_dig_response(response_dict):
     try:
         reply_content = response_dict[0]["content"]
-        minigames_or_ping = ["Dodge the the Fireball", "Catch the fish", "<@!484673336534892546>"]
-        if any(phrase in reply_content for phrase in minigames_or_ping):
+        minigames = ["Dodge the the Fireball", "Catch the fish", "order", "word", "game", "color", "Hit the ball", "emoji"]
+        if any(phrase in reply_content for phrase in minigames):
             print(reply_content)
             toaster = ToastNotifier()
             toaster.show_toast("Caught something in hunt or fish", "Needs human intervention", duration=10, threaded=False)
@@ -232,8 +264,6 @@ def main():
         for command in grind_commands:
             command_text = command.split("=")[0]
             command_wait = int(command.split("=")[1])
-            if "hl" in command_text:
-                normal_hl = True
             send_message(connect(), text[4], command_text)
             time.sleep(command_wait)
             if "beg" not in command_text and "hl" not in command_text:

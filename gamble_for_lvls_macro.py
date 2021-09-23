@@ -135,7 +135,6 @@ def search_response(response_dict):
         option_labels = []
         for i in range(len(search_options)):
             option_labels.append(search_options[i]["label"])
-        print(option_labels)
         if "grass" in option_labels:
             choice = search_options[option_labels.index("grass")]
         elif "mels room" in option_labels:

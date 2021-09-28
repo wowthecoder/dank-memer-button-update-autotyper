@@ -127,7 +127,7 @@ def scratch_response(response_dict):
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
                 scratch_response(response_dict[1:])
         
-#separate search response to prioritise area51, grass, and mels room
+#separate search response to prioritise grass, and mels room
 def search_response(response_dict):
     try:
         message_id = response_dict[0]["id"]
@@ -297,7 +297,6 @@ def press_event_button(connection, guild_id, channel_id, message_id, custom_id):
         print("Encountered exception when pressing event button:", e)
         
 def capture_events():
-    events = []
     while True:
         if not keep_running:
             return
@@ -330,6 +329,7 @@ def capture_events():
                         bold_asterisks = [a.start() for a in re.finditer("\*\*", embed_description)]
                         wanted_property = embed_description[(bold_asterisks[0]+2):bold_asterisks[1]] #name, cost, or type
                         print("wanted property:", wanted_property)
+                        answer_button = button_options[0]
                         for button in button_options:
                             if button["label"].lower() == item_info[wanted_property]:
                                 answer_button = button

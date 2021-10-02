@@ -1,18 +1,18 @@
 from http.client import HTTPSConnection
 import json
-from time import sleep
+import time
 from random import randint
 import re
 from pynput import keyboard
 import threading
 from win10toast_click import ToastNotifier
 
-file = open("info_alt.txt")
+file = open("info.txt")
 text = file.read().splitlines()
 
 if len(text)!= 5 or input("Configure bot? (y/n): ") == "y":
     file.close()
-    file = open("info_alt.txt", "w")
+    file = open("info.txt", "w")
     text = []
     text.append(input("User agent: "))
     text.append(input("Discord token: "))
@@ -28,6 +28,12 @@ if len(text)!= 5 or input("Configure bot? (y/n): ") == "y":
 
 comm_file = open("dank_commands.txt")
 command_list = comm_file.read().splitlines()
+
+with open("shop_items.json", "r") as f:
+    shop_item_dict = json.load(f)
+
+with open("trivia_answers.json", "r") as f:
+    trivia_answers_map = json.load(f)
 
 header_data = {
     "content-type": "application/json",
@@ -76,14 +82,12 @@ def reply_to_dank_memer(command):
         search_response(response_dict)
     elif "crime" in command:
         crime_response(response_dict)
-    elif "trivia" in command:
-        trivia_response(response_dict)
     elif "pm" in command:
         pm_response(response_dict, 0)
     elif "hl" in command:
         hl_response(response_dict)
-    elif "fish" in command or "dig" in command:
-        fish_dig_response(response_dict)
+    elif "hunt" in command or "fish" in command or "dig" in command:
+        hunt_fish_dig_response(response_dict)
 
 def press_button(connection, channel_id, guild_id, message_id, button_id, button_hash):
     button_data = {
@@ -109,7 +113,6 @@ def press_button(connection, channel_id, guild_id, message_id, button_id, button
 #separate search response to prioritise area51, grass, and mels room
 def search_response(response_dict):
     try:
-        print(response_dict)
         message_id = response_dict[0]["id"]
         search_options = response_dict[0]["components"][0]["components"]
         option_labels = []
@@ -150,19 +153,6 @@ def crime_response(response_dict):
                 crime_response(response_dict[1:])
         print("Encountered exception during crime:", e)
 
-def trivia_response(response_dict):
-    try:
-        message_id = response_dict[0]["id"]
-        answer_options = response_dict[0]["components"][0]["components"] #Options are in the array of dictionary of button info
-        choice = answer_options[randint(0,len(answer_options)-1)]
-        #now press the button
-        press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
-    except Exception as e:
-        if len(response_dict[1]["components"]) > 0 and len(response_dict[1]["embeds"]) > 0:
-            if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                trivia_response(response_dict[1:])
-        print("Encountered exception during trivia:", e)
-
 def pm_response(response_dict, i):
     try:
         response = response_dict[i]["content"]
@@ -175,17 +165,17 @@ def pm_response(response_dict, i):
         choice = pm_options[randint(0, len(pm_options)-1)]
         #now press the button
         press_button(connect(), text[4], text[3], message_id, choice["custom_id"], choice["hash"])
-        sleep(1)
+        time.sleep(1)
         result_dict = get_response(connect(), text[4])
         result_msg = result_dict[i]["embeds"][0]["description"]
         if "broke" in result_msg:
             send_message(connect(), text[4], "pls item laptop")
-            sleep(2)
+            time.sleep(2)
             laptop_reply_dict = get_response(connect(), text[4])
             laptop_reply = laptop_reply_dict[0]["embeds"][0]["title"]
             if "owned" not in laptop_reply:
                 send_message(connect(), text[4], "pls with 5000")
-                sleep(1)
+                time.sleep(1)
                 send_message(connect(), text[4], "pls buy laptop")
     except Exception as e:
         if len(response_dict[1]["components"]) > 0 and len(response_dict[1]["embeds"]) > 0:
@@ -211,13 +201,14 @@ def hl_response(response_dict):
                 trivia_response(response_dict[1:])
         print("Encountered exception during highlow:", e)
         
-def fish_dig_response(response_dict):
+def hunt_fish_dig_response(response_dict):
     try:
         reply_content = response_dict[0]["content"]
-        if "fish is too strong" in reply_content or "what's in the dirt" in reply_content:
-            #if "Type" not in reply_content and "reverse" not in reply_content:
+        minigames = ["Dodge the the Fireball", "Catch the fish", "order", "word", "game", "color", "Hit the ball", "emoji"]
+        if any(phrase in reply_content for phrase in minigames):
+            print(reply_content)
             toaster = ToastNotifier()
-            toaster.show_toast("Caught something in fish or dig", "Needs human intervention", duration=10, threaded=False)
+            toaster.show_toast("Caught something in hunt or fish", "Needs human intervention", duration=10, threaded=False)
     except Exception as e:
         print("Encountered exception during fish or dig:", e)
 
@@ -231,11 +222,11 @@ def on_press(key):
         return False
 
 def main():
-    #For testing
+    '''#For testing
     send_message(connect(), text[4], "pls search")
-    sleep(2)
+    time.sleep(2)
     reply_to_dank_memer("pls search")
-    sleep(randint(29, 35))
+    time.sleep(randint(29, 35))
     '''
     beg_now = True #This boolean is to control the beg command to be sent once in 2 rounds to maximise xp earned(since beg command takes 45 sec while others take 30 sec)
     while True:
@@ -251,40 +242,93 @@ def main():
                     beg_now = False
             send_message(connect(), text[4], command)
             if "dep" not in command or "beg" not in command:
-                sleep(2)
+                time.sleep(2)
                 reply_to_dank_memer(command) #sleep in this function, get the reply first
-            sleep(randint(2,4))
-    '''
+            time.sleep(2)
+
+    
+def press_event_button(connection, guild_id, channel_id, message_id, custom_id):
+    button_data = {
+        "type": 3,
+        "guild_id": guild_id,
+        "channel_id": channel_id,
+        "message_id": message_id,
+        "message_flags": 0,
+        "application_id": "270904126974590976",
+        "data": {"component_type": 2, "custom_id": custom_id},
+    }
+
+    try:
+        connection.request("POST", "/api/v9/interactions", json.dumps(button_data), header_data)
+        response = connection.getresponse()
+        if 199 < response.status < 300: #everything is alright
+            pass
+        else:
+            print(f"While pressing event button, received HTTP {response.status}: {response.reason}")
+    except Exception as e:
+        print("Encountered exception when pressing event button:", e)
+        
 def capture_events():
     while True:
         if not keep_running:
             return
+        global daily_duration, daily_count
         try:
             event_dict = get_response(connect(), text[4])
-            event_str = event_dict[0]["content"]
-            event_str = event_str.replace("\\ufeff", "")
-            event_str = event_str.replace("\\", "")
-            if "Type" in event_str or "Retype" in event_str or "typing" in event_str:
-                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
-                type_this = event_str[(backticks[0]+1):backticks[1]]
-                print(type_this)
-                type_this = ''.join(c for c in type_this if c.isprintable())
-                print(type_this)
-                sleep(1)
-                send_message(connect(), text[4], type_this)
-            if "reverse" in event_str:
-                backticks = [j for j, letter in enumerate(event_str) if letter == "`"]
-                reverse_this = event_str[(backticks[0]+1):backticks[1]]
-                print(reverse_this)
-                reverse_this = ''.join(c for c in reverse_this if c.isprintable())
-                reverse_this = reverse_this[::-1]
-                print(reverse_this)
-                sleep(1)
-                send_message(connect(), text[4], reverse_this)
-            sleep(1)
-        except:
-            pass
-
+            message_id = event_dict[0]["id"]
+            shop_sales = ["What is the **type**", "What is the **name**", "What is the **cost**"]
+                        
+            if len(event_dict[0]["components"]) > 0 and len(event_dict[0]["components"][0]["components"]) == 1: #Boss fight                
+                print("Boss Event!")
+                press_event_button(connect(), text[3], text[4], message_id, event_dict[0]["components"][0]["components"][0]["custom_id"])
+            elif len(event_dict[0]["embeds"]) > 0 and len(event_dict[0]["components"]) > 0:
+                event_embed = event_dict[0]["embeds"][0]
+                embed_description = event_embed["description"]
+                button_options = event_dict[0]["components"][0]["components"]
+                if "chose a secret number" in embed_description:
+                    hl_response(event_dict)
+                elif any(phrase in embed_description for phrase in shop_sales):
+                    print("Yooo it's SHOP SALE mannnnn")
+                    if event_embed["image"]["url"] in shop_item_dict:
+                        item_info = shop_item_dict[event_embed["image"]["url"]]
+                        bold_asterisks = [a.start() for a in re.finditer("\*\*", embed_description)]
+                        wanted_property = embed_description[(bold_asterisks[0]+2):bold_asterisks[1]] #name, cost, or type
+                        print("wanted property:", wanted_property)
+                        answer_button = button_options[0]
+                        for button in button_options:
+                            if button["label"].lower() == item_info[wanted_property]:
+                                answer_button = button
+                                break
+                        press_event_button(connect(), text[3], text[4], message_id, answer_button["custom_id"])
+                    else:
+                        print("Eh I found no answer")
+                        choice = button_options[randint(0, len(button_options)-1)]
+                        press_event_button(connect(), text[3], text[4], message_id, choice["custom_id"]) 
+                elif "seconds to answer" in embed_description and "disabled" not in button_options[0]:
+                    print("Trivia night boiiiiiiiiiiii")
+                    button_options = event_dict[0]["components"][0]["components"]
+                    #Get the category
+                    category = event_dict[0]["embeds"][0]["fields"][1]["value"][1:-1]
+                    print(category)
+                    question = event_dict[0]["embeds"][0]["description"]
+                    bold_asterisks = [a.start() for a in re.finditer("\*\*", question)]
+                    question = question[(bold_asterisks[0]+2):bold_asterisks[1]]
+                    if category in trivia_answers_map and question in trivia_answers_map[category]:
+                        print("Found trivia answer")
+                        answer_text = trivia_answers_map[category][question]
+                        ans_btn = button_options[0] #fail safe
+                        for button in button_options:
+                            if button["label"] == answer_text:
+                                choice = button
+                                break  
+                    else:
+                        print("Can't find answer for trivia soz")
+                        choice = button_options[randint(0, len(button_options)-1)]
+                    press_event_button(connect(), text[3], text[4], message_id, choice["custom_id"])
+                        
+            time.sleep(1)
+        except Exception as e:
+            print("Encountered exception while capturing events:", e)
 listener = keyboard.Listener(on_press=on_press)
 listener.start()
 main_thread = threading.Thread(target=main)

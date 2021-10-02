@@ -301,7 +301,6 @@ def capture_events():
         global daily_duration, daily_count
         try:
             event_dict = get_response(connect(), text[4])
-            daily_str = event_dict[0]["content"]
             message_id = event_dict[0]["id"]
             shop_sales = ["What is the **type**", "What is the **name**", "What is the **cost**"]
             if len(event_dict[0]["embeds"]) > 0 and "title" in event_dict[0]["embeds"][0]:

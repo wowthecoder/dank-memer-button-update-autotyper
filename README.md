@@ -5,6 +5,7 @@ Just clone the repository to your local device(including the info.txt file) and 
 Install the missing modules via command prompt if you are seeing errors about missing modules:
 1. pip install pynput
 2. pip install win10toast-click\
+
 The first time you run the program, the program will prompt you to enter the 5 types of information below:
 1. User agent
    - Google search "what is my user agent?" and you will see the results

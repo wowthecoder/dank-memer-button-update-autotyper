@@ -2,7 +2,7 @@
 ## This script is compatible with the July 31 2021 button update!!
 Prerequisite: You have to install python in your computer and configure python to be in your PATH variables first.\
 ![image](https://user-images.githubusercontent.com/82577844/135723075-b9ce055d-6e37-4c8e-8169-6e3838b059a6.png)\
-(Tick the box that says "Add python 3.xx to PATH when installing Python")\
+(Tick the box that says "Add python 3.xx to PATH" when installing Python)\
 Just clone the repository to your local device(including the info.txt file) and run it. As simple as that.\
 Install the missing modules via command prompt if you are seeing errors about missing modules:
 1. pip install pynput

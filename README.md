@@ -21,7 +21,7 @@ The first time you run the program, the program will prompt you to enter the 5 t
    - Eg. if channel url = "https://discord.com/channels/238746123/8937492374" then the server ID would be 238746123
 5. Discord Channel ID
    - That's the string of numbers that is at the last part of the Discord Channel URL.
-   - Eg. if channel url = "https://discord.com/channels/238746123/8937492374" then the channel ID would be 8937492374\
+   - Eg. if channel url = "https://discord.com/channels/238746123/8937492374" then the channel ID would be 8937492374
 
 You only have to enter all this info once. In the future every time you run the program, it will ask you whether you want to configure the bot or not. Just press the enter/return key and the program will start normally.
 

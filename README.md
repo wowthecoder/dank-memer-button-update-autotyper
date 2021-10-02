@@ -10,7 +10,7 @@ Install the missing modules via command prompt if you are seeing errors about mi
 
 The first time you run the program, the program will prompt you to enter the 5 types of information below:
 1. User agent
-   - Google search "what is my user agent?" and you will see the results
+   - Google search "what is my user agent" and you will see the results
 2. Discord Token
    - See this video https://www.youtube.com/watch?v=YEgFvgg7ZPI 
 3. Discord Channel URL

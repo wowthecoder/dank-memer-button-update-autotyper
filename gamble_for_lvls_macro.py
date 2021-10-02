@@ -156,9 +156,7 @@ def crime_response(response_dict):
         option_labels = []
         for i in range(len(crime_options)):
             option_labels.append(crime_options[i]["label"])
-        if "devious lick" in option_labels:
-            choice = crime_options[option_labels.index("devious lick")]
-        elif "tax evasion" in option_labels:
+        if "tax evasion" in option_labels:
             choice = crime_options[option_labels.index("tax evasion")]
         else:
             choice = crime_options[randint(0, len(crime_options)-1)]
@@ -245,11 +243,11 @@ def main():
     while True:
         if not keep_running:
             return
-
+        
         if time.time() - daily_duration > 600 and open_daily is True: #The response captured in the event thread
             send_message(connect(), text[4], "pls use daily")
             time.sleep(2)
-
+        
         for command in gamble_list:
             command_text = command.split("=")[0]
             command_wait = int(command.split("=")[1])
@@ -303,17 +301,15 @@ def capture_events():
         global daily_duration, daily_count
         try:
             event_dict = get_response(connect(), text[4])
-            daily_str = event_dict[0]["content"]             
-            if "Box Contents" in daily_str or "Opening Daily Box" in daily_str:
-                print(daily_str)
-                daily_duration = time.time()
-                print(f"Ok daily opened at:", datetime.now())
-            if "active right now" in daily_str:
-                daily_duration = time.time()
-
+            daily_str = event_dict[0]["content"]
             message_id = event_dict[0]["id"]
             shop_sales = ["What is the **type**", "What is the **name**", "What is the **cost**"]
-            if len(event_dict[0]["components"]) > 0 and len(event_dict[0]["components"][0]["components"]) == 1: #Boss fight
+            if len(event_dict[0]["embeds"]) > 0 and "title" in event_dict[0]["embeds"][0]:
+                if "Loot Haul" in event_dict[0]["embeds"][0]["title"] or "Opening" in event_dict[0]["embeds"][0]["title"]:
+                    daily_duration = time.time()
+                    print("Ok, daily opened at:", datetime.now())
+                        
+            elif len(event_dict[0]["components"]) > 0 and len(event_dict[0]["components"][0]["components"]) == 1: #Boss fight                
                 print("Boss Event!")
                 press_event_button(connect(), text[3], text[4], message_id, event_dict[0]["components"][0]["components"][0]["custom_id"])
             elif len(event_dict[0]["embeds"]) > 0 and len(event_dict[0]["components"]) > 0:

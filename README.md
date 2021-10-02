@@ -25,7 +25,7 @@ The first time you run the program, the program will prompt you to enter the 5 t
 
 You only have to enter all this info once. In the future every time you run the program, it will ask you whether you want to configure the bot or not. Just press the enter/return key and the program will start normally.
 
-Note:
+Note:\
 The discord_autotyper\[new\].py is not that frequently maintained, please use the gamble_for_lvls_macro.py script.\
 This script **automatically opens daily boxes** but does **NOT** automatically use tidepods and pizzas(you have to use this two items manually)\
 Pressing the ESC key will stop the program automatically, while pressing the $ key will stop opening daily boxes.

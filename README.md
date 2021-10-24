@@ -9,7 +9,7 @@ Just clone the repository to your local device(including the info.txt file) and 
 Install the missing modules via command prompt if you are seeing errors about missing modules:
 ```
 pip install pynput
-pip install win10toast-click
+pip install win10toast_click
 ```
 
 The first time you run the program, the program will prompt you to enter the 5 types of information below:

@@ -203,7 +203,7 @@ def hl_response(response_dict):
 def hunt_fish_dig_response(response_dict):
     try:
         reply_content = response_dict[0]["content"]
-        minigames = ["Dodge the the Fireball", "Catch the fish", "order", "word", "game", "color", "Hit the ball", "emoji"]
+        minigames = ["Dodge the Fireball", "Catch the fish", "order", "word", "game", "color", "Hit the ball", "emoji"]
         if any(phrase in reply_content for phrase in minigames):
             print(reply_content)
             toaster = ToastNotifier()
@@ -212,10 +212,9 @@ def hunt_fish_dig_response(response_dict):
         print("Encountered exception during fish or dig:", e)
 
 keep_running = True
-open_daily = True
-gamble_list = ["pls with 4003=2", "pls se 1001=3", "pls gamble 1001=2", "pls slots max=2", "pls scratch 1001=2", "pls dep all=2"]
+gamble_list = ["pls with 5003=2", "pls se 1001=3", "pls gamble 1001=2", "pls slots max=2", "pls scratch 1001=2", "pls dep all=2"]
 grind_list = [["pls search=2", "pls crime=2", "pls beg=1", "pls pm=2", "pls hl=2"], ["pls search=2", "pls hunt=2", "pls fish=2", "pls dig=2"]]
-daily_duration = time.time() - 601
+
 
 def on_press(key):
     global keep_running, open_daily
@@ -239,14 +238,10 @@ def main():
     '''
     loop_count = 0
     no_need_wait = ["hunt", "fish", "dig"]
-    global normal_hl
+    send_message(connect(), text[4], "pls use daily 12")
     while True:
         if not keep_running:
             return
-        
-        if time.time() - daily_duration > 600 and open_daily is True: #The response captured in the event thread
-            send_message(connect(), text[4], "pls use daily")
-            time.sleep(2)
         
         for command in gamble_list:
             command_text = command.split("=")[0]
@@ -302,13 +297,8 @@ def capture_events():
         try:
             event_dict = get_response(connect(), text[4])
             message_id = event_dict[0]["id"]
-            shop_sales = ["What is the **type**", "What is the **name**", "What is the **cost**"]
-            if len(event_dict[0]["embeds"]) > 0 and "title" in event_dict[0]["embeds"][0]:
-                if "Loot Haul" in event_dict[0]["embeds"][0]["title"] or "Opening" in event_dict[0]["embeds"][0]["title"]:
-                    daily_duration = time.time()
-                    print("Ok, daily opened at:", datetime.now())
-                        
-            elif len(event_dict[0]["components"]) > 0 and len(event_dict[0]["components"][0]["components"]) == 1: #Boss fight                
+            shop_sales = ["What is the **type**", "What is the **name**", "What is the **cost**"]                       
+            if len(event_dict[0]["components"]) > 0 and len(event_dict[0]["components"][0]["components"]) == 1: #Boss fight                
                 print("Boss Event!")
                 press_event_button(connect(), text[3], text[4], message_id, event_dict[0]["components"][0]["components"][0]["custom_id"])
             elif len(event_dict[0]["embeds"]) > 0 and len(event_dict[0]["components"]) > 0:

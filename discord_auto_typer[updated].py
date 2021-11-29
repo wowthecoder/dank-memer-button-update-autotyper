@@ -198,7 +198,7 @@ def hl_response(response_dict):
     except Exception as e:
         if len(response_dict[1]["components"]) > 0 and len(response_dict[1]["embeds"]) > 0:
             if "disabled" not in response_dict[1]["components"][0]["components"][0]:
-                trivia_response(response_dict[1:])
+                hl_response(response_dict[1:])
         print("Encountered exception during highlow:", e)
         
 def hunt_fish_dig_response(response_dict):

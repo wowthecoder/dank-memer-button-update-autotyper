@@ -1,6 +1,6 @@
 # dank-memer-hack
 ## This script is compatible with the July 31 2021 button update!!
-### This project is still actively maintained, as of now it is updated to function with the October 9.4.4 update
+### The maintenance of this project has paused, as of now it is updated to function with the October 9.4.4 update
 Prerequisite: You have to install python in your computer and configure python to be in your PATH variables first.\
 ![image](https://user-images.githubusercontent.com/82577844/135723075-b9ce055d-6e37-4c8e-8169-6e3838b059a6.png)
 > (Tick the box that says "Add python 3.xx to PATH" when installing Python)
